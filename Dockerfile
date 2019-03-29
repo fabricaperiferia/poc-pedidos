@@ -1,7 +1,7 @@
 #prueba de dockerfile con springboot
 FROM openjdk:8-jdk-alpine AS base
 WORKDIR /app
-EXPOSE 8080
+EXPOSE 9000
 
 FROM maven:3.5.4-jdk-8-alpine AS build
 ARG APP_VERSION
