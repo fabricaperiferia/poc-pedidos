@@ -9,6 +9,7 @@
  */
 package com.aval.order.dto;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -27,7 +28,11 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class OrderDTO {
+public class OrderDTO implements Serializable {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -2091216570390121357L;
 	/**
 	 * Identificador del usuario
 	 */

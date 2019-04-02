@@ -22,7 +22,7 @@ import org.springframework.data.cassandra.repository.config.EnableCassandraRepos
  *
  */
 @Configuration
-@EnableCassandraRepositories
+@EnableCassandraRepositories(basePackages = "com.aval.order.repository.cassandra")
 public class CassandraConfig extends AbstractCassandraConfiguration {
 
 	/**

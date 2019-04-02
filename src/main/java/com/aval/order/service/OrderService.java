@@ -17,12 +17,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.aval.order.dto.OrderDTO;
-import com.aval.order.dto.ResponseObject;
 import com.aval.order.model.Order;
-import com.aval.order.repository.OrderRepository;
+import com.aval.order.repository.cassandra.OrderRepository;
 import com.aval.order.util.JsonUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Servicio de perdidos
@@ -31,12 +32,16 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  *
  */
 @Service
+@Slf4j
 public class OrderService {
 	/**
 	 * Repositorio de order
 	 */
 	@Autowired
 	private OrderRepository orderRepository;
+
+	@Autowired
+	private UserOrderService userOrderService;
 
 	/**
 	 * Dada una orden, la persiste
@@ -45,7 +50,7 @@ public class OrderService {
 	 * @return ResponseObject con identificador del pedido
 	 * @throws JsonProcessingException
 	 */
-	public ResponseObject checkout(OrderDTO orderDTO) throws JsonProcessingException {
+	public Order checkout(OrderDTO orderDTO) throws JsonProcessingException {
 		ObjectMapper mapper = new ObjectMapper();
 		String product = mapper.writeValueAsString(orderDTO.getDetail());
 		Order order = new Order();
@@ -54,11 +59,8 @@ public class OrderService {
 		order.setUserId(orderDTO.getUserId());
 		order.setId(UUID.randomUUID());
 		orderRepository.insert(order);
-		ResponseObject response = new ResponseObject();
-		response.setCode(1000);
-		response.setMessage("SUCCESS");
-		response.addPayload("orderId", order.getId());
-		return response;
+		userOrderService.addOrder(order);
+		return order;
 	}
 
 	/**
@@ -67,16 +69,12 @@ public class OrderService {
 	 * @param userId
 	 * @return Lista de pedidos
 	 */
-	public ResponseObject ordersByUser(String userId) {
-		ResponseObject response = new ResponseObject();
+	public List<OrderDTO> ordersByUser(String userId) {
+		log.info("consultando con userid {}", userId);
 		ObjectMapper mapper = new ObjectMapper();
-		List<Order> orders = orderRepository.findOrderByUserId(userId);
-		response.addPayload("Orders",
-				orders.stream().map(
-						e -> new OrderDTO(e.getUserId(), e.getCreation(), JsonUtil.getList(e.getProduct(), mapper)))
-						.collect(Collectors.toList()));
-		response.setCode(1000);
-		response.setMessage("SUCCESS");
-		return response;
+		List<Order> orders = userOrderService.ordersByUser(userId);
+		return orders.stream()
+				.map(e -> new OrderDTO(e.getUserId(), e.getCreation(), JsonUtil.getList(e.getProduct(), mapper)))
+				.collect(Collectors.toList());
 	}
 }
