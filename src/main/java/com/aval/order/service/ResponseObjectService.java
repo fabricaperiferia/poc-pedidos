@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import com.aval.order.dto.OrderDTO;
 import com.aval.order.dto.ResponseObject;
 import com.aval.order.model.Order;
+import com.aval.order.util.Codes;
 import com.fasterxml.jackson.core.JsonProcessingException;
 
 /**
@@ -43,8 +44,8 @@ public class ResponseObjectService {
 	 */
 	public ResponseObject checkout(OrderDTO orderDTO) throws JsonProcessingException {
 		ResponseObject response = new ResponseObject();
-		response.setCode(1000);
-		response.setMessage("SUCCESS");
+		response.setCode(Codes.SUCCESS.getValue());
+		response.setMessage(Codes.SUCCESS.getLabel());
 		Order order = orderService.checkout(orderDTO);
 		response.addPayload("orderId", order.getId());
 		return response;
@@ -60,8 +61,8 @@ public class ResponseObjectService {
 		ResponseObject response = new ResponseObject();
 		List<OrderDTO> orders = orderService.ordersByUser(userId);
 		response.addPayload("Orders", orders);
-		response.setCode(1000);
-		response.setMessage("SUCCESS");
+		response.setCode(Codes.SUCCESS.getValue());
+		response.setMessage(Codes.SUCCESS.getLabel());
 		return response;
 	}
 }
