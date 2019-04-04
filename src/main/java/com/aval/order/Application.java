@@ -65,6 +65,7 @@ public class Application {
 		List<String> listAllow = new ArrayList<>();
 		listAllow.add("/**");
 		listAllow.add("http://localhost:8100");
+		listAllow.add("http://172.168.10.52:8100");
 		config.setAllowedOrigins(listAllow);
 		source.registerCorsConfiguration("/**", config);
 		return new CorsFilter(source);
