@@ -51,6 +51,7 @@ public class OrderService {
 	 * @throws JsonProcessingException
 	 */
 	public Order checkout(OrderDTO orderDTO) throws JsonProcessingException {
+		log.info("Ingresando {}", orderDTO.toString());
 		ObjectMapper mapper = new ObjectMapper();
 		String product = mapper.writeValueAsString(orderDTO.getDetail());
 		Order order = new Order();

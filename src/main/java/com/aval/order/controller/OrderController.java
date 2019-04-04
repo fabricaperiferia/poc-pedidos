@@ -69,12 +69,13 @@ public class OrderController {
 	 *         pedido guardado
 	 * @throws JsonProcessingException
 	 */
-	@ApiOperation(value = "Almacena una orden", response = ResponseEntity.class)
+	@ApiOperation(value = "Almacena un pedido", response = ResponseEntity.class)
 	@ResponseBody
 	@PostMapping(value = "/checkout")
 	public ResponseEntity<ResponseObject> checkout(@RequestBody OrderDTO order, HttpServletRequest request)
 			throws JsonProcessingException {
 		if (processHttpRequest(request).is2xxSuccessful()) {
+			
 			return ResponseEntity.ok(responseObjectService.checkout(order));
 		}
 		return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ResponseObject());
@@ -88,7 +89,7 @@ public class OrderController {
 	 * @return Objeto ResponseEntity con cuerpo ResponseObject con listado de
 	 *         pedidos relacionado al id del usuario
 	 */
-	@ApiOperation(value = "Lista las órdenes de un usuario", response = ResponseEntity.class)
+	@ApiOperation(value = "Lista los pedidos de un usuario", response = ResponseEntity.class)
 	@ResponseBody
 	@PostMapping(value = "/user")
 	public ResponseEntity<ResponseObject> ordersByUser(@RequestBody String userId, HttpServletRequest request) {
