@@ -9,10 +9,14 @@
  */
 package com.aval.order.controller;
 
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import com.aval.order.dto.ResponseObject;
@@ -41,5 +45,20 @@ public class CustomRestExceptionHandler extends ResponseEntityExceptionHandler {
 		apiError.setMessage(ex.getStatusCode().getReasonPhrase());
 		apiError.addPayload("error", ex.getResponseBodyAsString());
 		return new ResponseEntity<>(apiError, ex.getResponseHeaders(), ex.getStatusCode());
+	}
+
+	/**
+	 * Controla una petición que no se pueda leer
+	 */
+	@Override
+	protected ResponseEntity<Object> handleHttpMessageNotReadable(HttpMessageNotReadableException ex,
+			HttpHeaders headers, HttpStatus status, WebRequest request) {
+		logger.error(ex.getMessage());
+		logger.error(ex.getHttpInputMessage());
+		ResponseObject apiError = new ResponseObject();
+		apiError.setCode(status.value());
+		apiError.setMessage(status.getReasonPhrase());
+		apiError.addPayload("error", ex.getMessage());
+		return new ResponseEntity<>(apiError, headers, status);
 	}
 }
