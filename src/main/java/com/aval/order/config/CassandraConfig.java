@@ -29,7 +29,7 @@ import org.springframework.web.filter.CorsFilter;
  *
  */
 @Configuration
-@EnableCassandraRepositories
+@EnableCassandraRepositories(basePackages = "com.aval.order.repository.cassandra")
 public class CassandraConfig extends AbstractCassandraConfiguration {
 
 	/**

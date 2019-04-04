@@ -9,6 +9,8 @@
  */
 package com.aval.order.dto;
 
+import java.io.Serializable;
+
 import lombok.Data;
 
 /**
@@ -18,7 +20,11 @@ import lombok.Data;
  *
  */
 @Data
-public class ProductDTO {
+public class ProductDTO implements Serializable{
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 3195182339921025923L;
 	/**
 	 * Identificador del producto
 	 */

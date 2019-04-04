@@ -9,6 +9,7 @@
  */
 package com.aval.order.model;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -27,7 +28,11 @@ import lombok.Data;
  */
 @Data
 @Table("Orders")
-public class Order {
+public class Order implements Serializable {
+	/**
+	 * Serial
+	 */
+	private static final long serialVersionUID = -708105114462311532L;
 	/**
 	 * Identificador
 	 */

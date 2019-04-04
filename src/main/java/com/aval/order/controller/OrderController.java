@@ -28,8 +28,11 @@ import org.springframework.web.client.RestTemplate;
 
 import com.aval.order.dto.OrderDTO;
 import com.aval.order.dto.ResponseObject;
-import com.aval.order.service.OrderService;
+import com.aval.order.service.ResponseObjectService;
 import com.fasterxml.jackson.core.JsonProcessingException;
+
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 
 /**
  * Clase de controlador rest para pedidos
@@ -39,12 +42,13 @@ import com.fasterxml.jackson.core.JsonProcessingException;
  */
 @RestController
 @RequestMapping(value = "/orders", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+@Api(value = "Sistema de Pedidos", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 public class OrderController {
 	/**
 	 * Servicio de pedidos
 	 */
 	@Autowired
-	private OrderService orderService;
+	private ResponseObjectService responseObjectService;
 	/**
 	 * Objeto de consumo de servicios
 	 */
@@ -65,12 +69,13 @@ public class OrderController {
 	 *         pedido guardado
 	 * @throws JsonProcessingException
 	 */
+	@ApiOperation(value = "Almacena una orden", response = ResponseEntity.class)
 	@ResponseBody
 	@PostMapping(value = "/checkout")
 	public ResponseEntity<ResponseObject> checkout(@RequestBody OrderDTO order, HttpServletRequest request)
 			throws JsonProcessingException {
 		if (processHttpRequest(request).is2xxSuccessful()) {
-			return ResponseEntity.ok(orderService.checkout(order));
+			return ResponseEntity.ok(responseObjectService.checkout(order));
 		}
 		return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ResponseObject());
 	}
@@ -83,11 +88,12 @@ public class OrderController {
 	 * @return Objeto ResponseEntity con cuerpo ResponseObject con listado de
 	 *         pedidos relacionado al id del usuario
 	 */
+	@ApiOperation(value = "Lista las órdenes de un usuario", response = ResponseEntity.class)
 	@ResponseBody
 	@PostMapping(value = "/user")
 	public ResponseEntity<ResponseObject> ordersByUser(@RequestBody String userId, HttpServletRequest request) {
 		if (processHttpRequest(request).is2xxSuccessful()) {
-			return ResponseEntity.ok(orderService.ordersByUser(userId));
+			return ResponseEntity.ok(responseObjectService.ordersByUser(userId));
 		}
 		return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ResponseObject());
 	}
@@ -96,10 +102,13 @@ public class OrderController {
 	 * Consume el servicio de validación de token con la cabecera recibida
 	 * 
 	 * @param request
-	 * @return ResponseEntity autorizado si el token es válido, sin autorización en
-	 *         caso contrario
+	 * @return UNAUTHORIZED si el request o AUTHORIZATION o la validación del token
+	 *         son no válidas
 	 */
 	private HttpStatus processHttpRequest(HttpServletRequest request) {
+		if (request == null || request.getHeader(HttpHeaders.AUTHORIZATION) == null) {
+			return HttpStatus.UNAUTHORIZED;
+		}
 		HttpHeaders headers = new HttpHeaders();
 		headers.set(HttpHeaders.AUTHORIZATION, request.getHeader(HttpHeaders.AUTHORIZATION));
 		HttpEntity<String> entity = new HttpEntity<>("parameters", headers);

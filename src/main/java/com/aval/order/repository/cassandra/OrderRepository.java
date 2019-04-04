@@ -7,7 +7,7 @@
  * compañía.
  * 
  */
-package com.aval.order.repository;
+package com.aval.order.repository.cassandra;
 
 import java.util.List;
 import java.util.UUID;
