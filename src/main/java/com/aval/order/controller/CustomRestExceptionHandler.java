@@ -20,6 +20,8 @@ import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import com.aval.order.dto.ResponseObject;
+import com.aval.order.exception.NotVerifiedSignedJWTException;
+import com.aval.order.exception.SignedJWTNullException;
 
 /**
  * Clase encargada de controlar los errores del REST controller
@@ -60,5 +62,21 @@ public class CustomRestExceptionHandler extends ResponseEntityExceptionHandler {
 		apiError.setMessage(status.getReasonPhrase());
 		apiError.addPayload("error", ex.getMessage());
 		return new ResponseEntity<>(apiError, headers, status);
+	}
+
+	/**
+	 * Controla las excepciones por JWT
+	 * 
+	 * @param ex
+	 * @return ResponseEntity con ResponseObject
+	 */
+	@ExceptionHandler({ NotVerifiedSignedJWTException.class, SignedJWTNullException.class })
+	public ResponseEntity<ResponseObject> handleSignedJWT(final Exception ex) {
+		logger.error(ex.getMessage());
+		ResponseObject apiError = new ResponseObject();
+		apiError.setCode(HttpStatus.NOT_ACCEPTABLE.ordinal());
+		apiError.setMessage(HttpStatus.NOT_ACCEPTABLE.getReasonPhrase());
+		apiError.setDetailedMessage(ex.getMessage());
+		return new ResponseEntity<>(apiError, HttpStatus.NOT_ACCEPTABLE);
 	}
 }

@@ -9,16 +9,21 @@
  */
 package com.aval.order.service;
 
+import java.io.IOException;
+import java.text.ParseException;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.aval.order.dto.OrderDTO;
+import com.aval.order.dto.Request;
 import com.aval.order.dto.ResponseObject;
+import com.aval.order.exception.NotVerifiedSignedJWTException;
+import com.aval.order.exception.SignedJWTNullException;
 import com.aval.order.model.Order;
 import com.aval.order.util.Codes;
-import com.fasterxml.jackson.core.JsonProcessingException;
+import com.nimbusds.jose.JOSEException;
 
 /**
  * Clase de servicio para ResponseObject
@@ -35,19 +40,28 @@ public class ResponseObjectService {
 	@Autowired
 	private OrderService orderService;
 
+	@Autowired
+	private JOSEService joseService;
+
 	/**
 	 * Dada una orden, la persiste
 	 * 
 	 * @param orderDTO
 	 * @return ResponseObject con identificador del pedido
-	 * @throws JsonProcessingException
+	 * @throws JOSEException
+	 * @throws IOException
+	 * @throws NotVerifiedSignedJWTException
+	 * @throws SignedJWTNullException
+	 * @throws ParseException
 	 */
-	public ResponseObject checkout(OrderDTO orderDTO) throws JsonProcessingException {
+	public ResponseObject checkout(Request input)
+			throws JOSEException, IOException, ParseException, SignedJWTNullException, NotVerifiedSignedJWTException {
 		ResponseObject response = new ResponseObject();
 		response.setCode(Codes.SUCCESS.getValue());
 		response.setMessage(Codes.SUCCESS.getLabel());
+		OrderDTO orderDTO = joseService.getObjectFromToken(input.getToken(), "pedido", OrderDTO.class);
 		Order order = orderService.checkout(orderDTO);
-		response.addPayload("orderId", order.getId());
+		response.addPayload("token", joseService.getToken("new order", "orderid", order.getId()));
 		return response;
 	}
 
@@ -56,11 +70,18 @@ public class ResponseObjectService {
 	 * 
 	 * @param userId identificador de usuario
 	 * @return ResponseObject con listado de pedidos
+	 * @throws IOException
+	 * @throws NotVerifiedSignedJWTException
+	 * @throws SignedJWTNullException
+	 * @throws JOSEException
+	 * @throws ParseException
 	 */
-	public ResponseObject ordersByUser(String userId) {
+	public ResponseObject ordersByUser(Request input)
+			throws ParseException, JOSEException, SignedJWTNullException, NotVerifiedSignedJWTException, IOException {
 		ResponseObject response = new ResponseObject();
+		String userId = joseService.getObjectFromToken(input.getToken(), "userid", String.class);
 		List<OrderDTO> orders = orderService.ordersByUser(userId);
-		response.addPayload("Orders", orders);
+		response.addPayload("token", joseService.getToken("Orders by User", "orders", orders));
 		response.setCode(Codes.SUCCESS.getValue());
 		response.setMessage(Codes.SUCCESS.getLabel());
 		return response;

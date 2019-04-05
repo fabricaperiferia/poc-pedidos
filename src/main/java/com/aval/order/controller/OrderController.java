@@ -9,6 +9,9 @@
  */
 package com.aval.order.controller;
 
+import java.io.IOException;
+import java.text.ParseException;
+
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,10 +29,12 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
-import com.aval.order.dto.OrderDTO;
+import com.aval.order.dto.Request;
 import com.aval.order.dto.ResponseObject;
+import com.aval.order.exception.NotVerifiedSignedJWTException;
+import com.aval.order.exception.SignedJWTNullException;
 import com.aval.order.service.ResponseObjectService;
-import com.fasterxml.jackson.core.JsonProcessingException;
+import com.nimbusds.jose.JOSEException;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -63,20 +68,23 @@ public class OrderController {
 	/**
 	 * Guarda un pedido.
 	 * 
-	 * @param order   Perdido
+	 * @param input
 	 * @param request
 	 * @return Objeto ResponseEntity con cuerpo ResponseObject con identificador del
 	 *         pedido guardado
-	 * @throws JsonProcessingException
+	 * @throws JOSEException
+	 * @throws NotVerifiedSignedJWTException 
+	 * @throws SignedJWTNullException 
+	 * @throws IOException 
+	 * @throws ParseException
 	 */
 	@ApiOperation(value = "Almacena un pedido", response = ResponseEntity.class)
 	@ResponseBody
 	@PostMapping(value = "/checkout")
-	public ResponseEntity<ResponseObject> checkout(@RequestBody OrderDTO order, HttpServletRequest request)
-			throws JsonProcessingException {
+	public ResponseEntity<ResponseObject> checkout(@RequestBody Request input, HttpServletRequest request)
+			throws JOSEException, IOException, ParseException, SignedJWTNullException, NotVerifiedSignedJWTException {
 		if (processHttpRequest(request).is2xxSuccessful()) {
-			
-			return ResponseEntity.ok(responseObjectService.checkout(order));
+			return ResponseEntity.ok(responseObjectService.checkout(input));
 		}
 		return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ResponseObject());
 	}
@@ -84,17 +92,23 @@ public class OrderController {
 	/**
 	 * Devuelve un listado de pedidos por identificador de usuario
 	 * 
-	 * @param userId
+	 * @param input
 	 * @param request
 	 * @return Objeto ResponseEntity con cuerpo ResponseObject con listado de
 	 *         pedidos relacionado al id del usuario
+	 * @throws IOException
+	 * @throws NotVerifiedSignedJWTException
+	 * @throws SignedJWTNullException
+	 * @throws JOSEException
+	 * @throws ParseException
 	 */
 	@ApiOperation(value = "Lista los pedidos de un usuario", response = ResponseEntity.class)
 	@ResponseBody
 	@PostMapping(value = "/user")
-	public ResponseEntity<ResponseObject> ordersByUser(@RequestBody String userId, HttpServletRequest request) {
+	public ResponseEntity<ResponseObject> ordersByUser(@RequestBody Request input, HttpServletRequest request)
+			throws ParseException, JOSEException, SignedJWTNullException, NotVerifiedSignedJWTException, IOException {
 		if (processHttpRequest(request).is2xxSuccessful()) {
-			return ResponseEntity.ok(responseObjectService.ordersByUser(userId));
+			return ResponseEntity.ok(responseObjectService.ordersByUser(input));
 		}
 		return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ResponseObject());
 	}
