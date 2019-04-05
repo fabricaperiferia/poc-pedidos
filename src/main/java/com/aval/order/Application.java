@@ -9,17 +9,13 @@
  */
 package com.aval.order;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.web.client.RestTemplate;
-import org.springframework.web.cors.CorsConfiguration;
-import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-import org.springframework.web.filter.CorsFilter;
+
+import com.aval.order.config.SimpleCorsFilter;
 
 /**
  * Clase principal encargada de iniciar la aplicación
@@ -55,19 +51,7 @@ public class Application {
 	 * @return CorsFilter
 	 */
 	@Bean
-	public CorsFilter corsFilter() {
-		UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-		CorsConfiguration config = new CorsConfiguration();
-		config.setAllowCredentials(true);
-		config.addAllowedOrigin("*");
-		config.addAllowedHeader("*");
-		config.addAllowedMethod("*");
-		List<String> listAllow = new ArrayList<>();
-		listAllow.add("/**");
-		listAllow.add("http://localhost:8100");
-		listAllow.add("http://172.168.10.52:8100");
-		config.setAllowedOrigins(listAllow);
-		source.registerCorsConfiguration("/**", config);
-		return new CorsFilter(source);
+	public SimpleCorsFilter corsFilter() {
+		return new SimpleCorsFilter();
 	}
 }
