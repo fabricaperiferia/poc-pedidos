@@ -14,6 +14,7 @@ import java.util.UUID;
 
 import org.springframework.data.cassandra.repository.CassandraRepository;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.aval.order.model.Order;
 
@@ -24,6 +25,7 @@ import com.aval.order.model.Order;
  *
  */
 @Repository
+@Transactional
 public interface OrderRepository extends CassandraRepository<Order, UUID> {
 	/**
 	 * Lista las ordenes por identificador de usuario

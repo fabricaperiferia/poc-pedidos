@@ -11,6 +11,7 @@ package com.aval.order.repository.redis;
 
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.aval.order.model.UserOrder;
 
@@ -21,6 +22,7 @@ import com.aval.order.model.UserOrder;
  *
  */
 @Repository
+@Transactional
 public interface UserOrderRepository extends CrudRepository<UserOrder, String> {
 
 }
