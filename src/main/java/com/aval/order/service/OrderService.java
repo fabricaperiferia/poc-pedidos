@@ -60,7 +60,7 @@ public class OrderService {
 		order.setUserId(orderDTO.getUserId());
 		order.setId(UUID.randomUUID());
 		orderRepository.insert(order);
-		userOrderService.addOrder(order);
+		//userOrderService.addOrder(order);
 		return order;
 	}
 
