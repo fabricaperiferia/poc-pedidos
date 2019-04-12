@@ -61,12 +61,12 @@ public class UserOrderService {
 		}
 		return userOrderRepository.save(user);
 	}
-	/**
-	 * 
-	 * @param userid
-	 * @return
-	 */
-	@Cacheable(value = "orders", key = "#userid")
+//	/**
+//	 * 
+//	 * @param userid
+//	 * @return
+//	 */
+//	@Cacheable(value = "orders", key = "#userid")
 	public List<Order> ordersByUser(String userid) {
 		Optional<UserOrder> userOrder = userOrderRepository.findById(userid);
 		if (userOrder.isPresent()) {
